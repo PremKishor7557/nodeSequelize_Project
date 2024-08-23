@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add User</title>
+    <style>
+        input{
+            width: 300px;
+            height: 30px;
+            border-radius: 2px;
+            display: inline-block;
+            text-align:left;
+        }
+
+        .submit{
+            background-color: crimson;
+            color: white;
+            width: 300px;
+            height: 30px;
+            display:inline-block;
+            text-align: center;
+        }
+
+        .required:after{
+            content: "*";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Add User</h1>
+    <form action="/register" method="post" enctype="multipart/form-data">
+        <label for="" class="required" >Name</label>
+        <input type="text" name="name" class="input">
+        <label for="" class="required">Email</label>
+        <input type="text" name="email" class="input">
+        <br>
+        <br>
+        <label for="" class="required">Moblie</label>
+        <input type="text" name="mobile" class="input">
+        <label for="" class="required">Date of Birth</label>
+        <input type="date" name="dob" class="input">
+        <br>
+        <br>
+        <label for="" class="required">Address</label>
+        <input type="text" name="address" class="input">
+        <label for="" class="required">Photo Upload</label>
+        <input type="file" name="image" accept="image/*">
+        <br>
+        <br>
+        <button type="submit" class="submit">Add</button>
+    </form>
+</body>
+</html>
