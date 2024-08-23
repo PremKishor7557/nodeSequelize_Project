@@ -8,6 +8,7 @@ const db = {};
 db.user = require('./user')(sequelize,DataTypes,Model)
 db.contact = require('./contact')(sequelize,DataTypes)
 db.userContacts = require('./userContacts')(sequelize,DataTypes,db.user,db.contact)
+db.adduser = require('./addModel')(sequelize,DataTypes,Model)
 
 //db.user.hasOne(db.contact,{foreignKey: 'user_id',as:'contactDetails'});
 
@@ -17,5 +18,5 @@ db.userContacts = require('./userContacts')(sequelize,DataTypes,db.user,db.conta
 db.user.belongsToMany(db.contact, { through: db.userContacts });
 db.contact.belongsToMany(db.user, { through: db.userContacts });
 
-db.sequelize.sync({ force: false });
+db.sequelize.sync({ force: true });
 module.exports=db;

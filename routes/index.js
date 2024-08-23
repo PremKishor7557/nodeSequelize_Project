@@ -1,4 +1,5 @@
 var express = require('express');
+var userCtrl = require('../controllers/userController')
 var router = express.Router();
 
 /* GET home page. */
@@ -13,4 +14,6 @@ router.get('/user', function (req, res){
 router.get('/register', (req, res)=>{
   res.render('adduser');
 });
+
+router.get('/regis', userCtrl.addUser)
 module.exports = router;
