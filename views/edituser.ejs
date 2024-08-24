@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <style>
+        input{
+            width: 300px;
+            height: 30px;
+            border-radius: 2px;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .submit{
+            background-color: crimson;
+            color: white;
+            width: 300px;
+            height: 30px;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .required:after{
+            content: "*";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Edit User</h1>
+    <form action="/edit/<%= sampleData.id %>" method="post" enctype="application/x-www-form-urlencoded">
+        <label for="name" class="required">Name</label>
+        <input type="text" id="name" name="name" class="input" value="<%= sampleData.name %>">
+        <br>
+        <label for="email" class="required">Email</label>
+        <input type="text" id="email" name="email" class="input" value="<%= sampleData.email %>">
+        <br>
+        <br>
+        <label for="mobile" class="required">Mobile</label>
+        <input type="text" id="mobile" name="mobile" class="input" value="<%= sampleData.mobile %>">
+        <br>
+        <label for="dob" class="required">Date of Birth</label>
+        <input type="date"  id="dob" name="dob" class="input" value="<%= sampleData.dob %>">
+        <br>
+        <br>
+        <label for="address" class="required">Address</label>
+        <input type="text" id="address" name="address" class="input" value="<%= sampleData.address %>">
+        <label for="" class="required">Photo Upload</label>
+        <input type="file" id="image" name="image" accept="image/*" value="<%= sampleData.image %>">
+        <br>
+        <br>
+        <button type="submit" class="submit">Edit</button>
+    </form>
+</body>
+</html>

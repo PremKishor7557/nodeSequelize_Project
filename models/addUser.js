@@ -1,37 +1,42 @@
 module.exports = (sequelize,DataTypes,Model) =>{
-    class Adduser extends Model {}
+    class addUser extends Model {}
     
-    Adduser.init(
+    addUser.init(
       {
         // Model attributes are defined here
         name: {
           type: DataTypes.STRING,
-          allowNull: false,
+          //allowNull: false,
           //unique: true,
         },
         email: {
           type: DataTypes.STRING,
+          //allowNull: false,
           //defaultValue: 'Singh',
           // allowNull defaults to true
         },
         mobile: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING,
+            //allowNull: false,
         },
         dob: {
-            type: DataTypes.DATE
+            type: DataTypes.DATEONLY,
+            //allowNull: false,
         },
         address: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            //allowNull: false,
         },
         image: {
-            type: DataTypes.BLOB
+            type: DataTypes.STRING,
+            //allowNull: false,
         }
       },
       {
         // Other model options go here
         sequelize, // We need to pass the connection instance
-        modelName: 'Adduser', // We need to choose the model name
+        modelName: 'addUser', // We need to choose the model name
       },
     );
-    return Adduser;
+    return addUser;
     }

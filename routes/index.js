@@ -1,5 +1,6 @@
 var express = require('express');
-var userCtrl = require('../controllers/userController')
+var registerCtrl = require('../controllers/registerController')
+
 var router = express.Router();
 
 /* GET home page. */
@@ -11,9 +12,11 @@ router.get('/user', function (req, res){
   res.send('Hello World')
 })
 
-router.get('/register', (req, res)=>{
+router.get('/add', (req, res)=>{
   res.render('adduser');
 });
+router.post('/add', registerCtrl.upload.single("image") , registerCtrl.registerUser)
+router.get('/edit/:id', registerCtrl.getEditUser);
+router.post('/edit/:id', registerCtrl.postEditUser);
 
-router.get('/regis', userCtrl.addUser)
 module.exports = router;
