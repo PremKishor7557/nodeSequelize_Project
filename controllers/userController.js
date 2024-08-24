@@ -46,6 +46,9 @@ var postUsers = async (req, res)=>{
     res.status(200).json({data:data});
 }
 
+
+
+
 var deleteUser = async (req, res)=>{
     const data = await User.destroy({
         where:{
