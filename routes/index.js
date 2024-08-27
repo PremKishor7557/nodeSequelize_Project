@@ -12,11 +12,13 @@ router.get('/user', function (req, res){
   res.send('Hello World')
 })
 
-router.get('/add', (req, res)=>{
+router.get('/adduser', (req, res)=>{
   res.render('adduser');
 });
-router.post('/add', registerCtrl.upload.single("image") , registerCtrl.registerUser)
-router.get('/edit/:id', registerCtrl.getEditUser);
-router.post('/edit/:id', registerCtrl.postEditUser);
+router.post('/adduser', registerCtrl.upload.single("image") , registerCtrl.registerUser)
+router.get('/edituser/:id', registerCtrl.getEditUser);
+router.post('/edituser/:id', registerCtrl.postEditUser);
+router.get('/listuser', registerCtrl.getListUser);
+
 
 module.exports = router;

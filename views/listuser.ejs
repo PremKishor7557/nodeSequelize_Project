@@ -4,35 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User List</title>
+    <title>Users List</title>
 </head>
 <body>
-    <h1>User List</h1>
+    <h1>Users List</h1>
     <table border="1">
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Mobile</th>
-            <th>Date of Birth</th>
-            <th>Address</th>
-            <th>Image</th>
-        </tr>
-        <% users.forEach(user => { %>
-        <tr>
-            <td><%= user.name %></td>
-            <td><%= user.email %></td>
-            <td><%= user.mobile %></td>
-            <td><%= user.dob %></td>
-            <td><%= user.address %></td>
-            <td>
-                <% if (user.image) { %>
-                    <img src="../public/images<%= user.image %>" alt="<%= user.name %>" width="100" />
-                <% } else { %>
-                    No Image
-                <% } %>
-            </td>
-        </tr>
-        <% }) %>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Mobile</th>
+                <th>Date of Birth</th>
+                <th>Address</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(user => { %>
+            <tr>
+                <td><%= user.name %></td>
+                <td><%= user.email %></td>
+                <td><%= user.mobile %></td>
+                <td><%= user.dob %></td>
+                <td><%= user.address %></td>
+                <td><img src="<%= user.image %>" alt="User Image" width="100"></td>
+            </tr>
+            <% }) %>
+        </tbody>
     </table>
 </body>
 </html>

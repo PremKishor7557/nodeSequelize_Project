@@ -51,35 +51,6 @@ var getEditUser = async (req, res) =>{
     }
 }
 
-// var postEditUser = async (req, res) =>{
-//     try {
-//         const userId = req.params.id;
-//         const user = await addUser.findByPk(userId);
-//         const updatedData = {
-//             name: req.body.name,
-//             email: req.body.email,
-//             mobile: req.body.mobile,
-//             dob: req.body.dob,
-//             address: req.body.address,
-//             image: req.file ? req.file.filename : req.body.currentImage  // Handle file upload
-//         };
-
-//         //const user = await addUser.findByPk(userId);
-
-//         if (user) {
-//             await addUser.update(updatedData);
-//             //res.redirect(`/edit/${userId}`);  // Redirect to the edit page or any other page after update
-//             console.log('User updated successfully:', user);
-//             return user;  // Return the updated user
-//         } else {
-//             res.status(404).send('User not found');
-//         }
-//     } catch (error) {
-//         console.error('Error updating user:', error);
-//         res.status(500).send('Server error');
-//     }
-// }
-
 var postEditUser = async (req, res) =>{
     const userId = req.params.id;
     const { name, email, mobile, dob, address, image } = req.body;
@@ -113,56 +84,22 @@ var postEditUser = async (req, res) =>{
   }
 }
 
-// var postEditUser = async (req, res) =>{
-//     const userId = req.params.id;
-//    //const { name, email, mobile, dob, address, image } = req.body;
-//    //console.log("Updating user with ID:", userId);
-//    //console.log("Data received:", { name, email, mobile, dob, address, image });
-//    var updatedData = req.body;
-//   try {
-//     // Update the user record
-//     const [updated] = await addUser.update(
-//         updatedData,
-//       {
-//         where: { id: userId },
-//       }
-//     );
+var getListUser = async (req, res) => {
+    try {
+      const users = await addUser.findAll(); // Fetch all users from the database
+      res.render('listuser', { users }); // Pass users data to the 'users.ejs' template
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).send('Internal Server Error');
+    }
+}
 
-//     if (updated) {
-//       const updatedUser = await addUser.findOne({ where: { id: userId } });
-//       res.status(200).json({ message: 'User updated successfully', user: updatedUser });
-//     } else {
-//       res.status(404).json({ message: 'User not found' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'An error occurred while updating the user' });
-//   }
-// }
+//enctype="application/x-www-form-urlencoded"
 
-// var postEditUser= async (req, res) => {
-//     try {
-//         const userid = req.params.id
-//       const user = await addUser.findByPk(userid);
-//       if (user) {
-//         await user.update(req.body,{
-//             where:{
-//                 id:userid
-//             }
-//         }); // Update user data with the form data
-//         res.redirect(`/user/${user.id}/edit`); // Redirect to the edited form page or another appropriate page
-//       } else {
-//         res.status(404).send('User not found');
-//       }
-//     } catch (error) {
-//       res.status(500).send('Server error');
-//     }
-//   }
-
-var getListUser = async (req, )
 module.exports = {
     registerUser,
     upload,
     getEditUser,
-    postEditUser
+    postEditUser,
+    getListUser
 };

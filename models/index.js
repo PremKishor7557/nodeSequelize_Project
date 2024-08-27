@@ -9,6 +9,7 @@ db.user = require('./user')(sequelize,DataTypes,Model)
 db.contact = require('./contact')(sequelize,DataTypes)
 db.userContacts = require('./userContacts')(sequelize,DataTypes,db.user,db.contact)
 db.addUser = require('./addUser')(sequelize,DataTypes,Model)
+db.jwtUser = require('./jwtUser')(sequelize,DataTypes,Model)
 
 //db.user.hasOne(db.contact,{foreignKey: 'user_id',as:'contactDetails'});
 
