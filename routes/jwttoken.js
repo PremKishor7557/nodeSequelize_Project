@@ -5,6 +5,6 @@ var router = express.Router();
 
 router.post('/register', jwtCtrl.register)
 router.post('/login', jwtCtrl.login)
-router.post('/profile', jwtmdwr.authenticateToken, jwtCtrl.login)
+router.post('/profile', jwtmdwr.authenticateToken, jwtCtrl.getUserDetails)
 
 module.exports = router;

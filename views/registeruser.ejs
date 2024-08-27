@@ -30,7 +30,7 @@
 </head>
 <body>
     <h1>Add User</h1>
-    <form action="/adduser" method="post" enctype="multipart/form-data">
+    <form action="/register" method="post" enctype="multipart/form-data">
         <label for="" class="required" >Name</label>
         <input type="text" name="name" class="input">
         <label for="" class="required">Email</label>
@@ -49,7 +49,11 @@
         <input type="file" name="image" accept="image/*">
         <br>
         <br>
-        <button type="submit" class="submit">Add</button>
+        <label for="" class="required" >Password</label>
+        <input type="text" name="password" class="input">
+        <br>
+        <br>
+        <button type="submit" class="submit">Register</button>
     </form>
 </body>
 </html>

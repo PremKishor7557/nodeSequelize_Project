@@ -2,7 +2,6 @@ var db = require('../models/index')
 var jwtUser = db.jwtUser;
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = 'Premshankarki$hor'
 
 var register = async (req, res) => {
   try {
@@ -53,17 +52,14 @@ var login = async (req, res) => {
     // Generate JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email }, // Payload
-      JWT_SECRET, // Secret key
+      process.env.JWT_SECRET, // Secret key
       { expiresIn: '1h' } // Token expiration time
     );
-   // process.env.JWT_SECRET, // Secret key
     res.json({ message: 'Login successful', token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-
-const { jwtUser } = require('../models'); // Adjust the path based on your project structure
 
 var getUserDetails = async (req, res) => {
   try {

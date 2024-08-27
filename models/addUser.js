@@ -30,7 +30,11 @@ module.exports = (sequelize,DataTypes,Model) =>{
         image: {
             type: DataTypes.STRING,
             //allowNull: false,
-        }
+        },
+        password: {
+          type: DataTypes.STRING,
+          //allowNull: false,
+        },
       },
       {
         // Other model options go here
