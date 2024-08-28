@@ -7,7 +7,7 @@ const { Sequelize, Op, QueryTypes} = require('sequelize');
 const nodemailer = require("nodemailer");
 
 var addUser = async (req, res) =>{
-const jane = await User.create({ firstName: "abhishek" ,lastName: "kumar"});
+const jane = await User.create({ firstName: "prem" ,lastName: "shankar"});
     //const jane = User.build({ firstName: "Jane" ,lastName: "singh"});
     console.log(jane instanceof User); // true
     console.log(jane.firstName); // "Jane"

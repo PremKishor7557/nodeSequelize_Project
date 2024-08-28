@@ -18,13 +18,23 @@ router.get('/register', (req, res)=>{
   res.render('registeruser');
 });
 
+router.post('/register',
+  registerCtrl.upload.single("image"),
+  registerValid.registerValidation,
+  registerValid.validatorUser, 
+  registerValid.validateImage, 
+  registerCtrl.registerUser
+)
 
-//{registerValidation,validatorUser};
-router.post('/register', registerValid.registerValidation, registerValid.validatorUser, registerCtrl.upload.single("image") , registerCtrl.registerUser)
 router.get('/login', (req, res)=>{
   res.render('loginuser');
 });
-router.post('/login', registerCtrl.loginUser)
+
+router.post('/login', 
+  registerValid.loginValidation,
+  registerValid.validatorUser,
+  registerCtrl.loginUser
+)
 
 router.use(jwtmdwr.authenticateToken);
 router.get('/getuser', registerCtrl.getUserDetails)
