@@ -48,41 +48,9 @@ var registerUser = async (req, res) => {
     }
 }
 
-// var register = async (req, res) => {
-//   try {
-//     const { name, email, password } = req.body;
-
-//     // Check if the user already exists
-//     const existingUser = await jwtUser.findOne({ where: { email } });
-//     if (existingUser) {
-//       return res.status(400).json({ message: 'Email already in use' });
-//     }
-
-//     // Hash the password
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password.toString(), salt);
-
-//     // Create the new user
-//     const newUser = await jwtUser.create({
-//       name,
-//       email,
-//       password: hashedPassword,
-//     });
-
-//     res.status(201).json({ message: 'User registered successfully', user: newUser });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-
-var getUsers = async (req, res)=>{
-  const data = await addUser.findAll({});
-  res.status(200).json({data:data});
-}
-
 var loginUser = async (req, res) => {
   try {
-    const {email, password } = req.body;
+    const { email, password } = req.body;
 
     // Find the user by email
     const user = await addUser.findOne({ where: { email } });
@@ -104,11 +72,54 @@ var loginUser = async (req, res) => {
       process.env.JWT_SECRET, // Secret key
       { expiresIn: '1h' } // Token expiration time
     );
-    res.json({ message: 'Login successful', token });
+
+    // Save the token in a cookie
+    res.cookie('authToken', token, {
+      httpOnly: true, // Prevents client-side JavaScript from accessing the token
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests
+    });
+
+    // Optionally, save the email in a separate cookie
+    res.cookie('userEmail', email, {
+      httpOnly: true, // Prevents client-side JavaScript from accessing the email
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'Strict',
+    });
+
+    // If you want to save the entire req.body in a cookie (not recommended for large payloads)
+    // res.cookie('userDetails', JSON.stringify(req.body), {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   sameSite: 'Strict',
+    // });
+
+    // Send a response back to the client
+    res.json({ message: 'Login successful' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+var getUserDetails = async (req, res) => {
+  try {
+    const userId = req.user.id; // ID extracted from the verified token
+
+    // Fetch user details from the database
+    const user = await addUser.findByPk(userId, {
+      attributes: { exclude: ['password'] }, // Exclude the password field
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 
 var getEditUser = async (req, res) =>{
     try {
@@ -174,8 +185,8 @@ var getListUser = async (req, res) => {
 module.exports = {
     registerUser,
     upload,
-    getUsers,
     loginUser,
+    getUserDetails,
     getEditUser,
     postEditUser,
     getListUser

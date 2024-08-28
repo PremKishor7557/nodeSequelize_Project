@@ -2,7 +2,7 @@ var express = require('express');
 const config = require('../config/db')
 require('../models')
 var userCtrl = require('../controllers/userController')
-var userValid = require('../validators/userValidator')
+//var userValid = require('../validators/userValidator')
 var bodyParser = require('body-parser')
 var router = express.Router();
 
@@ -26,7 +26,7 @@ router.get('/raw-queries', userCtrl.rawQueriesUser)
 router.get('/one-to-one', userCtrl.oneToOneUser)
 router.get('/one-to-many', userCtrl.oneToManyUser)
 router.get('/many-to-many', userCtrl.manyToManyUser)
-router.post('/validate',userValid.validationSchema,userValid.validatorUser)
+//router.post('/validate',userValid.validatorUser)
 router.get("/sendemail", userCtrl.sendMail);
 
 module.exports = router;
