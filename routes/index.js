@@ -20,7 +20,7 @@ router.get('/register', (req, res)=>{
 
 
 //{registerValidation,validatorUser};
-router.post('/register', registerCtrl.upload.single("image") , registerCtrl.registerUser)
+router.post('/register', registerValid.registerValidation, registerValid.validatorUser, registerCtrl.upload.single("image") , registerCtrl.registerUser)
 router.get('/login', (req, res)=>{
   res.render('loginuser');
 });
