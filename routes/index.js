@@ -37,11 +37,16 @@ router.post('/login',
   registerCtrl.loginUser
 )
 
-router.use(jwtmdwr.authenticateToken);
+//router.use(jwtmdwr.authenticateToken);
 router.get('/getuser', registerCtrl.getUserDetails)
 router.get('/edituser/:id', registerCtrl.getEditUser);
 router.post('/edituser/:id', registerCtrl.postEditUser);
 router.get('/listuser', registerCtrl.getListUser);
+router.get('/verify-otp', (req, res)=>{
+  res.render('verifyOtp');
+});
+router.post('/verify-otp', registerCtrl.verifyOtp);
+router.get('/verify-email', registerCtrl.verifyEmail);
 
 
 module.exports = router;

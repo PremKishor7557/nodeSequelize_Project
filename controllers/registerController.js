@@ -5,6 +5,7 @@ var addUser = db.addUser;
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../helpers/emailHelper');
+const emailVerifier = require('../helpers/emailVerifier');
 
 
 //const upload = multer({dest: "upload/"});
@@ -32,6 +33,10 @@ var registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password.toString(), salt);
 
+        const otp = emailVerifier.generateOTP();
+        const verificationToken = emailVerifier.generateVerificationToken();
+        const expirationTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
+
         // Create a new user record
         const newUser = await addUser.create({ 
             name : name,
@@ -40,15 +45,20 @@ var registerUser = async (req, res) => {
             dob : dob,
             address : address,
             image : req.file.filename,
-            password : hashedPassword
+            password : hashedPassword,
+            otp: otp,
+            otpExpiresAt: expirationTime,
+            verificationToken: verificationToken,
+            verificationTokenExpiresAt: expirationTime
         });
 
         // Send a welcome email to the user
         let subject = 'Welcome to Registration Portal'; // Subject line
         let text = `Hello ${newUser.name},\n\nThank you for registering at My App!,\n\nBest regards,\nAntier Solutions Pvt. Ltd.`; // Plain text body
-        let html = `<p>Hello <strong>${newUser.name}</strong>,</p><p>Thank you for registering at My App!</p>`; // HTML body
-        await sendEmail.sendWelcomeEmail(newUser, subject, text, html);
+        let html = `<p>Hello <strong>${newUser.name}</strong>,</p><p>Thank you for registering at My App!</p><br><p>Best regards</p><p>Antier Solutions Pvt. Ltd.</p>`; // HTML body
+        await sendEmail.sendUserEmail(newUser, subject, text, html);
 
+        await emailVerifier.sendVerificationEmail(newUser);
         //console.log(newUser);
         res.status(201).json({ message: 'User registered successfully and email sent on register email', user: newUser });
     } catch (error) {
@@ -189,6 +199,57 @@ var getListUser = async (req, res) => {
     }
 }
 
+var verifyOtp = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        const user = await addUser.findOne({ where: { email, otp } });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid OTP or email' });
+        }
+
+        if (user.otpExpiresAt < new Date()) {
+            return res.status(400).json({ message: 'OTP expired' });
+        }
+
+        user.isVerified = true;
+        user.otp = null;
+        user.otpExpiresAt = null;
+        await user.save();
+
+        res.status(200).json({ message: 'Email verified successfully' });
+    } catch (error) {
+        console.error('Error verifying OTP:', error);
+        res.status(500).json({ message: 'Error verifying OTP', error: error.message });
+    }
+};
+
+var verifyEmail = async (req, res) => {
+    try {
+        const { token, email } = req.query;
+
+        const user = await addUser.findOne({ where: { email, verificationToken: token } });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid token or email' });
+        }
+
+        if (user.verificationTokenExpiresAt < new Date()) {
+            return res.status(400).json({ message: 'Verification link expired' });
+        }
+
+        user.isVerified = true;
+        user.verificationToken = null;
+        user.verificationTokenExpiresAt = null;
+        await user.save();
+
+        res.status(200).json({ message: 'Email verified successfully' });
+    } catch (error) {
+        console.error('Error verifying email:', error);
+        res.status(500).json({ message: 'Error verifying email', error: error.message });
+    }
+};
 //enctype="application/x-www-form-urlencoded"
 
 module.exports = {
@@ -198,5 +259,7 @@ module.exports = {
     getUserDetails,
     getEditUser,
     postEditUser,
-    getListUser
+    getListUser,
+    verifyOtp,
+    verifyEmail
 };
