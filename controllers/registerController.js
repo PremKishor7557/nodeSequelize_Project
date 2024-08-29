@@ -4,6 +4,8 @@ const path = require('path');
 var addUser = db.addUser;
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
+const sendEmail = require('../helpers/emailHelper');
+
 
 //const upload = multer({dest: "upload/"});
 const storage = multer.diskStorage({
@@ -40,8 +42,15 @@ var registerUser = async (req, res) => {
             image : req.file.filename,
             password : hashedPassword
         });
+
+        // Send a welcome email to the user
+        let subject = 'Welcome to Registration Portal'; // Subject line
+        let text = `Hello ${newUser.name},\n\nThank you for registering at My App!,\n\nBest regards,\nAntier Solutions Pvt. Ltd.`; // Plain text body
+        let html = `<p>Hello <strong>${newUser.name}</strong>,</p><p>Thank you for registering at My App!</p>`; // HTML body
+        await sendEmail.sendWelcomeEmail(newUser, subject, text, html);
+
         //console.log(newUser);
-        res.status(201).json({ message: 'User registered successfully', user: newUser });
+        res.status(201).json({ message: 'User registered successfully and email sent on register email', user: newUser });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: 'Error registering user', error: error.message });

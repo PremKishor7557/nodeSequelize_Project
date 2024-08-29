@@ -18,5 +18,5 @@ db.addUser = require('./addUser')(sequelize,DataTypes,Model)
 // db.user.belongsToMany(db.contact, { through: db.userContacts });
 // db.contact.belongsToMany(db.user, { through: db.userContacts });
 
-db.sequelize.sync({ force: false });
+db.sequelize.sync({ force:true });
 module.exports=db;

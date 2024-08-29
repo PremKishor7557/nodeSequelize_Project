@@ -2,6 +2,7 @@ var express = require('express');
 var registerCtrl = require('../controllers/registerController')
 var registerValid = require('../validators/userValidator')
 var jwtmdwr = require('../middlewares/authenticate')
+//var nodemailer = require('../nodemailers/sendEmail')
 
 var router = express.Router();
 
