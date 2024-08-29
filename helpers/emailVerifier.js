@@ -17,7 +17,7 @@ const sendVerificationEmail = async (user) => {
     await sendEmail.sendUserEmail(user, subject, text, html);
 
     // Send verification link email
-    const verificationLink = `http://your-domain.com/verify-email?token=${user.verificationToken}&email=${user.email}`;
+    const verificationLink = `http://localhost:3000/verify-email?token=${user.verificationToken}&email=${user.email}`;
     subject = 'Email Verification Link'; // Subject line
     text = `Click on this link to verify your email: ${verificationLink}. It expires in 30 minutes.`; // Plain text body
     html = `<p>Hello <strong>${user.name}</strong>,</p><p>Click on this link to verify your email: ${verificationLink}. It expires in 30 minutes.</p><br><p>Best regards</p><p>Antier Solutions Pvt. Ltd.</p>`; // HTML body
