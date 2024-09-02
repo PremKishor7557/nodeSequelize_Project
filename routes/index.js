@@ -1,4 +1,5 @@
 var express = require('express');
+var {redisClient, sessionMiddleware} = require('../config/radis')
 var registerCtrl = require('../controllers/registerController')
 var registerValid = require('../validators/userValidator')
 var jwtmdwr = require('../middlewares/authenticate')
@@ -6,6 +7,7 @@ var jwtmdwr = require('../middlewares/authenticate')
 
 var router = express.Router();
 
+router.use(sessionMiddleware);
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -38,7 +40,10 @@ router.post('/login',
 )
 
 //router.use(jwtmdwr.authenticateToken);
-router.get('/getuser', registerCtrl.getUserDetails)
+router.get('/getuser', jwtmdwr.isAuthenticated, registerCtrl.getUserDetails)
+// router.get('/radisdata', jwtmdwr.isAuthenticated, registerCtrl.fetchSessionData , (req, res)=>{
+//   res.json({ message: 'Profile data', data: req.session });
+// })
 router.get('/edituser/:id', registerCtrl.getEditUser);
 router.post('/edituser/:id', registerCtrl.postEditUser);
 router.get('/listuser', registerCtrl.getListUser);

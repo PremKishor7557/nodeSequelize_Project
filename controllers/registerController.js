@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../helpers/emailHelper');
 const emailVerifier = require('../helpers/emailVerifier');
+var {redisClient, sessionMiddleware} = require('../config/radis')
 
 
 //const upload = multer({dest: "upload/"});
@@ -67,6 +68,59 @@ var registerUser = async (req, res) => {
     }
 }
 
+// var loginUser = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     // Find the user by email
+//     const user = await addUser.findOne({ where: { email } });
+
+//     // Check if user exists
+//     if (!user) {
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//     }
+
+//     // Verify the password
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     if (!isPasswordValid) {
+//       return res.status(400).json({ message: 'Invalid email or password' });
+//     }
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       { id: user.id, email: user.email }, // Payload
+//       process.env.JWT_SECRET, // Secret key
+//       { expiresIn: '1h' } // Token expiration time
+//     );
+
+//     // Save the token in a cookie
+//     res.cookie('authToken', token, {
+//       httpOnly: true, // Prevents client-side JavaScript from accessing the token
+//       secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+//       sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests
+//     });
+
+//     // Optionally, save the email in a separate cookie
+//     res.cookie('userEmail', email, {
+//       httpOnly: true, // Prevents client-side JavaScript from accessing the email
+//       secure: process.env.NODE_ENV === 'production',
+//       sameSite: 'Strict',
+//     });
+
+//     // If you want to save the entire req.body in a cookie (not recommended for large payloads)
+//     // res.cookie('userDetails', JSON.stringify(req.body), {
+//     //   httpOnly: true,
+//     //   secure: process.env.NODE_ENV === 'production',
+//     //   sameSite: 'Strict',
+//     // });
+
+//     // Send a response back to the client
+//     res.json({ message: 'Login successful' });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// };
+
 var loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -76,53 +130,35 @@ var loginUser = async (req, res) => {
 
     // Check if user exists
     if (!user) {
+      // Return to ensure no further code is executed after the response is sent
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
     // Verify the password
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      // Return to ensure no further code is executed after the response is sent
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, email: user.email }, // Payload
-      process.env.JWT_SECRET, // Secret key
-      { expiresIn: '1h' } // Token expiration time
-    );
-
-    // Save the token in a cookie
-    res.cookie('authToken', token, {
-      httpOnly: true, // Prevents client-side JavaScript from accessing the token
-      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-      sameSite: 'Strict', // Prevents the cookie from being sent with cross-site requests
-    });
-
-    // Optionally, save the email in a separate cookie
-    res.cookie('userEmail', email, {
-      httpOnly: true, // Prevents client-side JavaScript from accessing the email
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'Strict',
-    });
-
-    // If you want to save the entire req.body in a cookie (not recommended for large payloads)
-    // res.cookie('userDetails', JSON.stringify(req.body), {
-    //   httpOnly: true,
-    //   secure: process.env.NODE_ENV === 'production',
-    //   sameSite: 'Strict',
-    // });
+    // Save user information in session (stored in Redis)
+    req.session.userId = user.id;
+    req.session.email = user.email;
+    req.session.isAuthenticated = true;
 
     // Send a response back to the client
-    res.json({ message: 'Login successful' });
+    res.json({ message: 'Login successful' }); // Return to ensure no further code is executed
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // Return to ensure no further code is executed after the response is sent
+    return res.status(500).json({ error: error.message });
   }
 };
 
-var getUserDetails = async (req, res) => {
+
+
+const getUserDetails = async (req, res) => {
   try {
-    const userId = req.user.id; // ID extracted from the verified token
+    const userId = req.session.userId; // Get the user ID from the session
 
     // Fetch user details from the database
     const user = await addUser.findByPk(userId, {
@@ -130,15 +166,69 @@ var getUserDetails = async (req, res) => {
     });
 
     if (!user) {
+      // Return here to ensure no further code is executed
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json({ user });
+    // Send the user details back to the client
+    return res.json({ user }); // Return to ensure no further code is executed
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    // Return here to ensure no further code is executed
+    return res.status(500).json({ error: error.message });
   }
 };
 
+// const fetchSessionData = (req, res) => {
+//   console.log('Inside fetchSessionData middleware');
+//   const sessionId = req.cookies['connect.sid'];
+
+//   if (!sessionId) {
+//       console.log('No session ID found in cookies');
+//       return res.status(401).json({ message: 'No session ID found in cookies' });
+//   }
+
+//   console.log('Session ID found in cookies:', sessionId);
+
+//   redisClient.get(sessionId, (err, sessionData) => {
+//       console.log('Inside redisClient.get callback');
+//       if (err) {
+//           console.error('Error fetching session data from Redis:', err);
+//           return res.json(err);
+//       }
+
+//       if (sessionData) {
+//           console.log('Session data found in Redis:', sessionData);
+//           req.sessionData = JSON.parse(sessionData);
+//           console.log('Sending session data as response');
+//           return res.json(req.sessionData); // Ensure this line is reached
+//       } else {
+//           console.log('Session data not found in Redis');
+//           return res.status(404).json({ message: 'Session data not found in Redis' });
+//       }
+//   });
+// };
+
+
+// const fetchSessionData = async (req, res, next) => {
+//   const sessionId = req.cookies.sessionId; // Get session ID from cookies
+
+//   if (!sessionId) {
+//     return res.status(401).json({ message: 'No session ID found' });
+//   }
+
+//   try {
+//     const sessionData = await redisClient.get(sessionId); // Fetch session data from Redis
+//     if (!sessionData) {
+//       return res.status(401).json({ message: 'Session not found' });
+//     }
+
+//     req.sessionData = JSON.parse(sessionData); // Parse and attach session data to request
+//     next(); // Continue to the next middleware/route
+//   } catch (error) {
+//     console.error('Error fetching session data:', error);
+//     res.status(500).json({ message: 'Internal server error' });
+//   }
+// }
 
 var getEditUser = async (req, res) =>{
     try {

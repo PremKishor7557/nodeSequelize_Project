@@ -19,6 +19,29 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
+// const isAuthenticated = (req, res, next) => {
+//   if (req.session.isAuthenticated) {
+//     // If the user is authenticated, proceed to the next middleware or route handler
+//     next();
+//   } else {
+//     // If the user is not authenticated, return a 401 Unauthorized response
+//     res.status(401).json({ message: 'Unauthorized' });
+//   }
+// };
+
+const isAuthenticated = (req, res, next) => {
+  console.log('Inside isAuthenticated middleware');
+  if (req.session && req.session.isAuthenticated) {
+      // Proceed to the next middleware or route handler if authenticated
+      next();
+  } else {
+      // If not authenticated, return a 401 Unauthorized response
+      res.status(401).json({ message: 'Unauthorized' });
+  }
+};
+
+
 module.exports = {
-    authenticateToken
+    authenticateToken,
+    isAuthenticated
 };
