@@ -10,27 +10,29 @@ async function produce() {
     const connection = await amqp.connect('amqp://localhost');
     const channel = await connection.createChannel();
 
-    const exchange = 'producer';
-    const routingKey = 'info';
+    const exchange = 'Amazon Exch';
+    const routingKey = 'ProductOrderKey';
     var msg ='';
 
     // Declare an exchange
     await channel.assertExchange(exchange, 'direct', { durable: true });
 
-    for(let i=1; i<=100000; i++){
-        msg = 'Hello RabbitMQ with Exchange!'+i;
+    for(let i=1; i<=100; i++){
+        msg = "This is Order "+i;
 
         // Publish a message to the exchange with the routing key
         channel.publish(exchange, routingKey, Buffer.from(msg), { persistent: true });
+        console.log(msg);
     }
 
-    console.log(` [x] Sent '${msg}' to exchange '${exchange}' with routing key '${routingKey}'`);
+    console.log("Message Sent");
 
     // Close the connection and exit
     // setTimeout(() => {
     //   channel.close();
     //   connection.close();
     // }, 500);
+
   } catch (error) {
     console.error('Error in producer:', error);
   }

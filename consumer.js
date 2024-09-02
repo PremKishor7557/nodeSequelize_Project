@@ -8,9 +8,9 @@ async function consume() {
     const connection = await amqp.connect('amqp://localhost');
     const channel = await connection.createChannel();
 
-    const exchange = 'producer';
-    const queue = 'consumerqueue';
-    const routingKey = 'info';
+    const exchange = 'Amazon Exch';
+    const queue = 'ProductOrder';
+    const routingKey = 'ProductOderKey';
 
     // Declare an exchange
     await channel.assertExchange(exchange, 'direct', { durable: true });
@@ -21,17 +21,16 @@ async function consume() {
     // Bind the queue to the exchange with the routing key
     await channel.bindQueue(queue, exchange, routingKey);
 
-    console.log(` [*] Waiting for messages in queue '${queue}' bound to exchange '${exchange}' with routing key '${routingKey}'. To exit press CTRL+C`);
+    //console.log(` [*] Waiting for messages in queue '${queue}' bound to exchange '${exchange}' with routing key '${routingKey}'. To exit press CTRL+C`);
 
     // Consume messages from the queue
     channel.consume(queue, (msg) => {
       if (msg !== null) {
-        console.log(` [x] Received '${msg.content.toString()}'`);
+        console.log(`Received '${msg.content.toString()}'`);
         channel.ack(msg);
-      }else{
-        console.log("All messages are consumed");
       }
     });
+    console.log("Consuming Started");
   } catch (error) {
     console.error('Error in consumer:', error);
   }
