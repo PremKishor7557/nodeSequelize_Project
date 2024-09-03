@@ -27,7 +27,34 @@ const sendUserEmail = async (user, subject, text, html) => {
   }
 };
 
-module.exports = {sendUserEmail};
+const sendEmailQueue = async (email, subject, text, html) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      secure: true,
+      port: 465,
+      auth: {
+        user: 'prem.shankar@antiersolutions.com', // Replace with your Gmail address
+        pass: 'rwer umuv jlgk wino' // Replace with your Gmail password or app-specific password
+      }
+    });
+
+    const mailOptions = {
+      from: '"Antier Solutions Pvt. Ltd." <prem.shankar@antiersolutions.com>', // Replace with your sender address
+      to: email, // Recipient's email
+      subject: subject, // Subject line
+      text: text, // Plain text body
+      html: html // HTML body
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error('Error sending welcome email:', error);
+    throw new Error('Could not send welcome email');
+  }
+};
+
+module.exports = {sendUserEmail, sendEmailQueue};
 
 
 

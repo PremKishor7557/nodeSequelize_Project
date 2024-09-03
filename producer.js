@@ -1,4 +1,3 @@
-// producer.js
 const amqp = require('amqplib');
 
 
@@ -10,14 +9,14 @@ async function produce() {
     const connection = await amqp.connect('amqp://localhost');
     const channel = await connection.createChannel();
 
-    const exchange = 'Amazon Exch';
-    const routingKey = 'ProductOrderKey';
+    const exchange = 'Flipkart Exch';
+    const routingKey = 'OrderPlacedKey';
     var msg ='';
 
     // Declare an exchange
     await channel.assertExchange(exchange, 'direct', { durable: true });
 
-    for(let i=1; i<=100; i++){
+    for(let i=1; i<=10000; i++){
         msg = "This is Order "+i;
 
         // Publish a message to the exchange with the routing key

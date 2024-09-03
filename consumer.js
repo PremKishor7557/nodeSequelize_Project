@@ -2,15 +2,15 @@ const amqp = require('amqplib');
 
 async function consume() {
   try {
-    console.log("This is Product Consumer")
+    console.log("This is Inventory Consumer")
 
     // Connect to RabbitMQ server
     const connection = await amqp.connect('amqp://localhost');
     const channel = await connection.createChannel();
 
-    const exchange = 'Amazon Exch';
-    const queue = 'ProductOrder';
-    const routingKey = 'ProductOderKey';
+    const exchange = 'Flipkart Exch';
+    const queue = 'OrderPlaced';
+    const routingKey = 'OrderPlacedKey';
 
     // Declare an exchange
     await channel.assertExchange(exchange, 'direct', { durable: true });
@@ -36,3 +36,33 @@ async function consume() {
   }
 }
 consume();
+
+// async function consume() {
+//   try {
+//     console.log("This is Inventory Consumer");
+
+//     // Connect to RabbitMQ server
+//     const connection = await amqp.connect('amqp://localhost');
+//     const channel = await connection.createChannel();
+
+//     const queue = 'OrderPlaced';
+
+//     // Declare a queue (create if it doesn't exist)
+//     await channel.assertQueue(queue, { durable: true });
+
+//     // Consume messages from the queue
+//     channel.consume(queue, (msg) => {
+//       if (msg !== null) {
+//         console.log(`Received '${msg.content.toString()}'`);
+//         channel.ack(msg);
+//       }
+//     });
+
+//     console.log("Consuming Started");
+//   } catch (error) {
+//     console.error('Error in consumer:', error);
+//   }
+// }
+
+// consume();
+
