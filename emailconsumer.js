@@ -66,8 +66,8 @@ async function sendWelcomeMessage(name, email, content) {
 
         // Send a welcome email to the user
         let subject = 'Welcome to Registration Portal'; // Subject line
-        let text = `Hello ${name},\n\nThank you for registering at My App!,\n\nBest regards,\nAntier Solutions Pvt. Ltd.`; // Plain text body
-        let html = `<p>Hello <strong>${name}</strong>,</p><p>Thank you for registering at My App!</p><br><p>Best regards</p><p>Antier Solutions Pvt. Ltd.</p>`; // HTML body
+        let text = `Hello ${name},\n\n${content},\n\nBest regards,\nAntier Solutions Pvt. Ltd.`; // Plain text body
+        let html = `<p>Hello <strong>${name}</strong>,</p><p>${content}</p><br><p>Best regards</p><p>Antier Solutions Pvt. Ltd.</p>`; // HTML body
         await sendEmail.sendEmailQueue(email, subject, text, html);
 }
 

@@ -41,9 +41,6 @@ router.post('/login',
 
 //router.use(jwtmdwr.authenticateToken);
 router.get('/getuser', jwtmdwr.isAuthenticated, registerCtrl.getUserDetails)
-// router.get('/radisdata', jwtmdwr.isAuthenticated, registerCtrl.fetchSessionData , (req, res)=>{
-//   res.json({ message: 'Profile data', data: req.session });
-// })
 router.get('/edituser/:id', registerCtrl.getEditUser);
 router.post('/edituser/:id', registerCtrl.postEditUser);
 router.get('/listuser', registerCtrl.getListUser);
@@ -52,6 +49,7 @@ router.get('/verify-otp', (req, res)=>{
 });
 router.post('/verify-otp', registerCtrl.verifyOtp);
 router.get('/verify-email', registerCtrl.verifyEmail);
-
+registerCtrl.sendReminderEmails();
+//registerCtrl.stopReminderEmails();
 
 module.exports = router;

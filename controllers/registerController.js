@@ -8,6 +8,9 @@ const sendEmail = require('../helpers/emailHelper');
 const emailVerifier = require('../helpers/emailVerifier');
 var {redisClient, sessionMiddleware} = require('../config/radis')
 const amqp = require('amqplib');
+const cron = require('node-cron');
+const { Op } = require('sequelize');
+
 
 
 //const upload = multer({dest: "upload/"});
@@ -21,138 +24,138 @@ const storage = multer.diskStorage({
     }
 });
 const upload = multer({storage});
-// var registerUser = async (req, res) => {
-//     try {
-//         const { name, email, mobile, dob, address, password } = req.body;
+var registerUser = async (req, res) => {
+    try {
+        const { name, email, mobile, dob, address, password } = req.body;
 
-//         // Check if the user already exists
-//         const existingUser = await addUser.findOne({ where: { email } });
-//         if (existingUser) {
-//           return res.status(400).json({ message: 'Email already in use' });
-//         }
-
-//         // Hash the password
-//         const salt = await bcrypt.genSalt(10);
-//         const hashedPassword = await bcrypt.hash(password.toString(), salt);
-
-//         const otp = emailVerifier.generateOTP();
-//         const verificationToken = emailVerifier.generateVerificationToken();
-//         const expirationTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
-
-//         // Create a new user record
-//         const newUser = await addUser.create({ 
-//             name : name,
-//             email : email,
-//             mobile : mobile,
-//             dob : dob,
-//             address : address,
-//             image : req.file.filename,
-//             password : hashedPassword,
-//             otp: otp,
-//             otpExpiresAt: expirationTime,
-//             verificationToken: verificationToken,
-//             verificationTokenExpiresAt: expirationTime
-//         });
-
-//         // Send a welcome email to the user
-//         let subject = 'Welcome to Registration Portal'; // Subject line
-//         let text = `Hello ${newUser.name},\n\nThank you for registering at My App!,\n\nBest regards,\nAntier Solutions Pvt. Ltd.`; // Plain text body
-//         let html = `<p>Hello <strong>${newUser.name}</strong>,</p><p>Thank you for registering at My App!</p><br><p>Best regards</p><p>Antier Solutions Pvt. Ltd.</p>`; // HTML body
-//         await sendEmail.sendUserEmail(newUser, subject, text, html);
-
-//         await emailVerifier.sendVerificationEmail(newUser);
-//         //console.log(newUser);
-//         res.status(201).json({ message: 'User registered successfully and email sent on register email', user: newUser });
-//     } catch (error) {
-//         console.error('Error registering user:', error);
-//         res.status(500).json({ message: 'Error registering user', error: error.message });
-//     }
-// }
-
-const registerUser = async (req, res) => {
-  let connection;
-  let channel;
-  try {
-      const { name, email, mobile, dob, address, password } = req.body;
-
-      // Check if the user already exists
-      const existingUser = await addUser.findOne({ where: { email } });
-      if (existingUser) {
+        // Check if the user already exists
+        const existingUser = await addUser.findOne({ where: { email } });
+        if (existingUser) {
           return res.status(400).json({ message: 'Email already in use' });
-      }
+        }
 
-      // Hash the password
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password.toString(), salt);
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password.toString(), salt);
 
-      const otp = emailVerifier.generateOTP();
-      const verificationToken = emailVerifier.generateVerificationToken();
-      const expirationTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
+        const otp = emailVerifier.generateOTP();
+        const verificationToken = emailVerifier.generateVerificationToken();
+        const expirationTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
 
-      // Create a new user record
-      const newUser = await addUser.create({
-          name: name,
-          email: email,
-          mobile: mobile,
-          dob: dob,
-          address: address,
-          image: req.file.filename,
-          password: hashedPassword,
-          otp: otp,
-          otpExpiresAt: expirationTime,
-          verificationToken: verificationToken,
-          verificationTokenExpiresAt: expirationTime
-      });
+        // Create a new user record
+        const newUser = await addUser.create({ 
+            name : name,
+            email : email,
+            mobile : mobile,
+            dob : dob,
+            address : address,
+            image : req.file.filename,
+            password : hashedPassword,
+            otp: otp,
+            otpExpiresAt: expirationTime,
+            verificationToken: verificationToken,
+            verificationTokenExpiresAt: expirationTime
+        });
 
-      // RabbitMQ setup
-      const exchange = 'Email Notifications';
-      const RoutingKey = 'EmailNotificationsKey';
-      // const otpRoutingKey = 'otp_email';
-      // const verificationRoutingKey = 'verification_email';
+        // Send a welcome email to the user
+        let subject = 'Welcome to Registration Portal'; // Subject line
+        let text = `Hello ${newUser.name},\n\nThank you for registering at My App!,\n\nBest regards,\nAntier Solutions Pvt. Ltd.`; // Plain text body
+        let html = `<p>Hello <strong>${newUser.name}</strong>,</p><p>Thank you for registering at My App!</p><br><p>Best regards</p><p>Antier Solutions Pvt. Ltd.</p>`; // HTML body
+        await sendEmail.sendUserEmail(newUser, subject, text, html);
 
-      connection = await amqp.connect('amqp://localhost');
-      channel = await connection.createChannel();
+        await emailVerifier.sendVerificationEmail(newUser);
+        //console.log(newUser);
+        res.status(201).json({ message: 'User registered successfully and email sent on register email', user: newUser });
+    } catch (error) {
+        console.error('Error registering user:', error);
+        res.status(500).json({ message: 'Error registering user', error: error.message });
+    }
+}
 
-      await channel.assertExchange(exchange, 'direct', { durable: true });
+// const registerUser = async (req, res) => {
+//   let connection;
+//   let channel;
+//   try {
+//       const { name, email, mobile, dob, address, password } = req.body;
 
-      // Prepare messages
-      const welcomeMessage = {
-          "name" : newUser.name,
-          "email": newUser.email,
-          "type": "welcomeMessage",
-          "content": "Thank you for registering at My App!"
-      };
+//       // Check if the user already exists
+//       const existingUser = await addUser.findOne({ where: { email } });
+//       if (existingUser) {
+//           return res.status(400).json({ message: 'Email already in use' });
+//       }
 
-      const otpMessage = {
-          "name" : newUser.name,
-          "email": newUser.email,
-          "type": "verifyEmailOtp",
-          "content": "Your OTP code is :",
-          "otp" : newUser.otp
-      };
+//       // Hash the password
+//       const salt = await bcrypt.genSalt(10);
+//       const hashedPassword = await bcrypt.hash(password.toString(), salt);
 
-      const verificationMessage = {
-          "name" : newUser.name,
-          "email": newUser.email,
-          "type": "verifyEmailLink",
-          "content": "Click on this link to verify your email:",
-          "verificationToken": newUser.verificationToken
-      };
+//       const otp = emailVerifier.generateOTP();
+//       const verificationToken = emailVerifier.generateVerificationToken();
+//       const expirationTime = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
 
-      // Publish messages
-      channel.publish(exchange, RoutingKey, Buffer.from(JSON.stringify(welcomeMessage)), { persistent: true });
-      channel.publish(exchange, RoutingKey, Buffer.from(JSON.stringify(otpMessage)), { persistent: true });
-      channel.publish(exchange, RoutingKey, Buffer.from(JSON.stringify(verificationMessage)), { persistent: true });
+//       // Create a new user record
+//       const newUser = await addUser.create({
+//           name: name,
+//           email: email,
+//           mobile: mobile,
+//           dob: dob,
+//           address: address,
+//           image: req.file.filename,
+//           password: hashedPassword,
+//           otp: otp,
+//           otpExpiresAt: expirationTime,
+//           verificationToken: verificationToken,
+//           verificationTokenExpiresAt: expirationTime
+//       });
 
-      res.status(201).json({ message: 'User registered successfully and email tasks have been queued', user: newUser });
-  } catch (error) {
-      console.error('Error registering user:', error);
-      res.status(500).json({ message: 'Error registering user', error: error.message });
-  } finally {
-      if (channel) await channel.close();
-      if (connection) await connection.close();
-  }
-};
+//       // RabbitMQ setup
+//       const exchange = 'Email Notifications';
+//       const RoutingKey = 'EmailNotificationsKey';
+//       // const otpRoutingKey = 'otp_email';
+//       // const verificationRoutingKey = 'verification_email';
+
+//       connection = await amqp.connect('amqp://localhost');
+//       channel = await connection.createChannel();
+
+//       await channel.assertExchange(exchange, 'direct', { durable: true });
+
+//       // Prepare messages
+//       const welcomeMessage = {
+//           "name" : newUser.name,
+//           "email": newUser.email,
+//           "type": "welcomeMessage",
+//           "content": "Thank you for registering at My App!"
+//       };
+
+//       const otpMessage = {
+//           "name" : newUser.name,
+//           "email": newUser.email,
+//           "type": "verifyEmailOtp",
+//           "content": "Your OTP code is ",
+//           "otp" : newUser.otp
+//       };
+
+//       const verificationMessage = {
+//           "name" : newUser.name,
+//           "email": newUser.email,
+//           "type": "verifyEmailLink",
+//           "content": "Click on this link to verify your email:",
+//           "verificationToken": newUser.verificationToken
+//       };
+
+//       // Publish messages
+//       channel.publish(exchange, RoutingKey, Buffer.from(JSON.stringify(welcomeMessage)), { persistent: true });
+//       channel.publish(exchange, RoutingKey, Buffer.from(JSON.stringify(otpMessage)), { persistent: true });
+//       channel.publish(exchange, RoutingKey, Buffer.from(JSON.stringify(verificationMessage)), { persistent: true });
+
+//       res.status(201).json({ message: 'User registered successfully and email tasks have been queued', user: newUser });
+//   } catch (error) {
+//       console.error('Error registering user:', error);
+//       res.status(500).json({ message: 'Error registering user', error: error.message });
+//   } finally {
+//       if (channel) await channel.close();
+//       if (connection) await connection.close();
+//   }
+// };
 
 
 // var loginUser = async (req, res) => {
@@ -265,57 +268,6 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-// const fetchSessionData = (req, res) => {
-//   console.log('Inside fetchSessionData middleware');
-//   const sessionId = req.cookies['connect.sid'];
-
-//   if (!sessionId) {
-//       console.log('No session ID found in cookies');
-//       return res.status(401).json({ message: 'No session ID found in cookies' });
-//   }
-
-//   console.log('Session ID found in cookies:', sessionId);
-
-//   redisClient.get(sessionId, (err, sessionData) => {
-//       console.log('Inside redisClient.get callback');
-//       if (err) {
-//           console.error('Error fetching session data from Redis:', err);
-//           return res.json(err);
-//       }
-
-//       if (sessionData) {
-//           console.log('Session data found in Redis:', sessionData);
-//           req.sessionData = JSON.parse(sessionData);
-//           console.log('Sending session data as response');
-//           return res.json(req.sessionData); // Ensure this line is reached
-//       } else {
-//           console.log('Session data not found in Redis');
-//           return res.status(404).json({ message: 'Session data not found in Redis' });
-//       }
-//   });
-// };
-
-
-// const fetchSessionData = async (req, res, next) => {
-//   const sessionId = req.cookies.sessionId; // Get session ID from cookies
-
-//   if (!sessionId) {
-//     return res.status(401).json({ message: 'No session ID found' });
-//   }
-
-//   try {
-//     const sessionData = await redisClient.get(sessionId); // Fetch session data from Redis
-//     if (!sessionData) {
-//       return res.status(401).json({ message: 'Session not found' });
-//     }
-
-//     req.sessionData = JSON.parse(sessionData); // Parse and attach session data to request
-//     next(); // Continue to the next middleware/route
-//   } catch (error) {
-//     console.error('Error fetching session data:', error);
-//     res.status(500).json({ message: 'Internal server error' });
-//   }
-// }
 
 var getEditUser = async (req, res) =>{
     try {
@@ -427,6 +379,52 @@ var verifyEmail = async (req, res) => {
         res.status(500).json({ message: 'Error verifying email', error: error.message });
     }
 };
+
+// Function to send reminder emails
+let reminderCronJob
+const sendReminderEmails = () => {
+  // Schedule a job to run every minute
+  reminderCronJob = cron.schedule('* * * * *', async () => {
+    const oneMinuteAgo = new Date();
+    oneMinuteAgo.setMinutes(oneMinuteAgo.getMinutes() - 1);
+
+    try {
+      // Fetch users who haven't verified their email and registered at least 1 minute ago
+      const unverifiedUsers = await addUser.findAll({
+        where: {
+          isVerified: false,  // User is not verified
+          createdAt: {
+            [Op.lt]: oneMinuteAgo  // Registered more than a minute ago
+          }
+        }
+      });
+
+      // Send reminder emails to each unverified user
+      unverifiedUsers.forEach(async (user) => {
+        const verificationLink = `${process.env.BASE_URL}/verify-email?token=${user.verificationToken}`;
+
+        let subject= 'Reminder: Verify Your Email';
+        let text= `Hi ${user.name},\n\nPlease verify your email by clicking this link: ${verificationLink}\n\nIf you didn't register, ignore this message.`;
+        let html= `<p>Hi ${user.name},</p><p>Please verify your email by clicking <a href="${verificationLink}">here</a>.</p><p>If you didn't register, ignore this message.</p>`;
+        await sendEmail.sendUserEmail(user, subject, text, html);
+
+        console.log(`Sent reminder email to ${user.email}`);
+      });
+
+    } catch (error) {
+      console.error('Error sending reminder emails:', error);
+    }
+  });
+};
+
+// Function to stop sending reminder emails
+const stopReminderEmails = () => {
+  if (reminderCronJob) {
+    reminderCronJob.stop();
+    console.log('CRON job for sending reminder emails has been stopped.');
+  }
+};
+
 //enctype="application/x-www-form-urlencoded"
 
 module.exports = {
@@ -438,5 +436,7 @@ module.exports = {
     postEditUser,
     getListUser,
     verifyOtp,
-    verifyEmail
+    verifyEmail,
+    sendReminderEmails,
+    stopReminderEmails
 };
