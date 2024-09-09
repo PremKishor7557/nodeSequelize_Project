@@ -45,7 +45,7 @@ chai.use(chaiHttp);
 
 // Test for updating a user
   describe('PATCH /users/:id - Update User', () => {
-  
+    
     // Test for updating user with valid data
     it('should update a user with valid data', (done) => {
       const updatedUser = {
@@ -67,7 +67,7 @@ chai.use(chaiHttp);
     // Test for invalid firstName with numbers
     it('should fail validation if firstName contains numbers', (done) => {
       const updatedUser = {
-        firstName: 'prem123',  // Invalid as per model validation
+        firstName: 'janee123',  // Invalid as per model validation
         lastName: 'smith',
       };
   
@@ -85,7 +85,7 @@ chai.use(chaiHttp);
     // Test for updating with a too short firstName
     it('should fail validation if firstName is too short', (done) => {
       const updatedUser = {
-        firstName: 'p',  // Length less than the minimum (2)
+        firstName: 'j',  // Length less than the minimum (2)
         lastName: 'smith',
       };
   
@@ -95,7 +95,38 @@ chai.use(chaiHttp);
         .end((err, res) => {
           expect(res).to.have.status(400);
           expect(res.body).to.have.property('errors');
-          expect(res.body.errors[0].msg).to.contain('Validation len on firstName');
+          expect(res.body.errors[0].msg).to.contain('min 2 max 10 characters allowed');
+          done();
+        });
+    });
+  });
+
+  // Test for deleting a user
+  describe('DELETE /users/:id - Delete User', function() {
+    // Assuming you have a known user ID for testing
+    const validUserId = 1; // Replace with an ID that exists in your database
+    const invalidUserId = 9999; // Replace with a non-existent ID for testing
+  
+    // Test for successfully deleting a user
+    it('should delete a user with a valid ID', function(done) {
+      chai.request(app)
+        .delete(`/users/users/${validUserId}`)
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.have.property('data');
+          expect(res.body.data).to.equal(1); // Sequelize's `destroy` returns number of deleted rows
+          done();
+        });
+    });
+  
+    // Test for trying to delete a non-existent user
+    it('should return 404 when trying to delete a non-existent user', function(done) {
+      chai.request(app)
+        .delete(`/users/users/${invalidUserId}`)
+        .end((err, res) => {
+          expect(res).to.have.status(404);
+          expect(res.body).to.have.property('message');
+          expect(res.body.message).to.equal('User not found'); // Ensure this matches your actual response
           done();
         });
     });

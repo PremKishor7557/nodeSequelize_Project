@@ -49,14 +49,33 @@ var postUsers = async (req, res)=>{
 
 
 
-var deleteUser = async (req, res)=>{
-    const data = await User.destroy({
-        where:{
-            id:req.params.id
-        }
+// var deleteUser = async (req, res)=>{
+//     const data = await User.destroy({
+//         where:{
+//             id:req.params.id
+//         }
+//     });
+//     res.status(200).json({data:data});
+// }
+
+var deleteUser = async (req, res) => {
+    const userId = req.params.id;
+    
+    // Check if the user exists
+    const user = await User.findByPk(userId);
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // If user exists, proceed to delete
+    const result = await User.destroy({
+      where: { id: userId }
     });
-    res.status(200).json({data:data});
-}
+  
+    res.status(200).json({ data: result });
+  }
+  
 
 var patchUser = async (req, res)=>{
     var updatedData = req.body;
