@@ -7,7 +7,7 @@ module.exports = (sequelize,DataTypes,Model) =>{
         firstName: {
           type: DataTypes.STRING,
           allowNull: false,
-          unique: true,
+          //unique: true,
           validate:{
             isAlpha: {
               msg:'Only alphabets are allowed'
