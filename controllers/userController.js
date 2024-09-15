@@ -27,14 +27,41 @@ var getUsers = async (req, res)=>{
     res.status(200).json({data:data});
 }
 
-var getUser = async (req, res)=>{
-    const data = await User.findOne({
-        where:{
-            id:req.params.id
+// var getUser = async (req, res)=>{
+//     const data = await User.findOne({
+//         where:{
+//             id:req.params.id
+//         }
+//     });
+//     res.status(200).json({data:data});
+// }
+
+var getUser = async (req, res) => {
+    try {
+        const data = await User.findOne({
+            where: {
+                id: req.params.id
+            }
+        });
+
+        if (!data) {
+            // If no user is found, return a 404 status with an appropriate message
+            return res.status(404).json({
+                message: 'User not found'
+            });
         }
-    });
-    res.status(200).json({data:data});
-}
+
+        // If the user is found, return the user data
+        res.status(200).json({ data: data });
+    } catch (error) {
+        // Handle any errors that may occur during the query
+        res.status(500).json({
+            message: 'Server error',
+            error: error.message
+        });
+    }
+};
+
 
 var postUsers = async (req, res)=>{
     var postData = req.body;

@@ -4,8 +4,8 @@ const RedisStore = require('connect-redis').default;
 
 // Create a Redis client
 const redisClient = redis.createClient({
-  host: 'localhost',
-  port: 6379,
+  host: process.env.REDIS_HOST || 'localhost',  // Use the environment variable or default to 'localhost'
+  port: process.env.REDIS_PORT || 6379,         // Use the environment variable or default to 6379
   //password: process.env.REDIS_PASSWORD // If you have a password set for Redis
 });
 

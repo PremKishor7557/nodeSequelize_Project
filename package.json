@@ -5,7 +5,7 @@
   "scripts": {
     "start": "nodemon ./bin/www",
     "test": "mocha",
-    "test-report":"mocha tests --reporter mochawesome ---reporter-options reportDir=Report, reportFilename=Testcase_Report"
+    "test-report":"mocha test --reporter mochawesome ---reporter-options reportDir=Report, reportFilename=Testcase_Report"
   },
   "dependencies": {
     "amqplib": "^0.10.4",
@@ -36,3 +36,4 @@
     "swagger-ui-express": "^5.0.1"
   }
 }
+

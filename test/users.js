@@ -5,6 +5,50 @@ const { expect } = chai;
 
 chai.use(chaiHttp);
 
+// Test for getting user
+describe('GET /users/:id - Fetch Single User', () => {
+  let validUserId;
+  const invalidUserId = 9999; // Assume this ID does not exist in your database
+
+  // Use the API to get a valid user ID before the test cases
+  before(async () => {
+    const res = await chai.request(app).get('/users/users'); // Adjust the endpoint to list users
+    if (res.body && res.body.data && res.body.data.length > 0) {
+      validUserId = res.body.data[0].id; // Use an existing user's ID for the test
+    } else {
+      throw new Error('No user found in the database.');
+    }
+  });
+
+  // Test for successful retrieval of a single user
+  it('should fetch a single user with valid ID', (done) => {
+    chai.request(app)
+      .get(`/users/users/${validUserId}`)
+      .end((err, res) => {
+        expect(err).to.be.null;
+        expect(res).to.have.status(200);
+        expect(res.body).to.have.property('data');
+        expect(res.body.data).to.have.property('firstName');
+        expect(res.body.data).to.have.property('lastName');
+        expect(res.body.data).to.have.property('fullName');
+        done();
+      });
+  });
+
+  // Test for trying to fetch a non-existent user
+  it('should return 404 when user is not found', (done) => {
+    chai.request(app)
+      .get(`/users/users/${invalidUserId}`)
+      .end((err, res) => {
+        expect(err).to.be.null;
+        expect(res).to.have.status(404);
+        expect(res.body).to.have.property('message');
+        expect(res.body.message).to.equal('User not found'); // Ensure the message matches your implementation
+        done();
+      });
+  });
+});
+
   // Test for creating a single user
   describe('POST /users - Single User Creation', () => {
     it('should create a single user with valid data', (done) => {

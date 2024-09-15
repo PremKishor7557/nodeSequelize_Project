@@ -401,7 +401,7 @@ const sendReminderEmails = () => {
 
       // Send reminder emails to each unverified user
       unverifiedUsers.forEach(async (user) => {
-        const verificationLink = `${process.env.BASE_URL}/verify-email?token=${user.verificationToken}`;
+        const verificationLink = `${process.env.BASE_URL}/verify-email?token=${user.verificationToken}&email=${user.email}`;
 
         let subject= 'Reminder: Verify Your Email';
         let text= `Hi ${user.name},\n\nPlease verify your email by clicking this link: ${verificationLink}\n\nIf you didn't register, ignore this message.`;
