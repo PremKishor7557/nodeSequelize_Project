@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const sendEmail = require('../helpers/emailHelper');
 const emailVerifier = require('../helpers/emailVerifier');
 var {redisClient, sessionMiddleware} = require('../config/radis')
-const amqp = require('amqplib');
+const amqp = require ('amqplib');
 const cron = require('node-cron');
 const { Op } = require('sequelize');
 
