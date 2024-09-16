@@ -7,12 +7,12 @@ services:
       DB_USER: user
       DB_PASS: password
       DB_NAME: employeedb
-      MASTER_HOST: master
+      MASTER_HOST: localhost
       MASTER_PORT: 3308
-      REPLICA_HOST: replica
+      REPLICA_HOST: localhost
       REPLICA_PORT: 3307
     ports:
-      - "8000:3000"
+      - "3000:3000"
     depends_on:
       - master
       - replica

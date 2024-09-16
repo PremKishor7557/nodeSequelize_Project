@@ -6,21 +6,27 @@ var Contact = db.contact;
 const { Sequelize, Op, QueryTypes} = require('sequelize');
 const nodemailer = require("nodemailer");
 
+// var addUser = async (req, res) =>{
+// const jane = await User.create({ firstName: "prem" ,lastName: "shankar"});
+//     //const jane = User.build({ firstName: "Jane" ,lastName: "singh"});
+//     console.log(jane instanceof User); // true
+//     console.log(jane.firstName); // "Jane"
+//     //jane.set({ firstName: "Anuj" ,lastName: "Kumar"});
+//     // await jane.update({ firstName: "arun" ,lastName: "singha"});
+//     // await jane.save();
+//     //await jane.save();
+//     console.log('Jane was saved to the database!');
+//     // await jane.destroy();
+//     await jane.reload();
+//     console.log(jane.toJSON());
+//     res.status(200).json(jane.toJSON());
+// }
 var addUser = async (req, res) =>{
-const jane = await User.create({ firstName: "ravi" ,lastName: "kumar"});
-    //const jane = User.build({ firstName: "Jane" ,lastName: "singh"});
-    console.log(jane instanceof User); // true
-    console.log(jane.firstName); // "Jane"
-    //jane.set({ firstName: "Anuj" ,lastName: "Kumar"});
-    // await jane.update({ firstName: "arun" ,lastName: "singha"});
-    // await jane.save();
-    //await jane.save();
-    console.log('Jane was saved to the database!');
-    // await jane.destroy();
-    await jane.reload();
+    const jane = await User.create({ firstName: "nilesh" ,lastName: "dawn"});
     console.log(jane.toJSON());
     res.status(200).json(jane.toJSON());
 }
+
 
 var getUsers = async (req, res)=>{
     const data = await User.findAll({});
