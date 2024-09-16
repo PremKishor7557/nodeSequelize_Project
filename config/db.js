@@ -24,14 +24,14 @@ const sequelize = new Sequelize('employeedb', null, null, {
   replication: {
     read: [
       {
-        host: 'replica', // Docker service name for replica
+        host: 'localhost', // Docker service name for replica
         port: 3307, // Port for replica (from docker-compose.yml)
         username: 'user', // Same user for both master and replica
         password: 'password', // Root password as per your setup
       },
     ],
     write: {
-      host: 'master', // Docker service name for master
+      host: 'localhost', // Docker service name for master
       port: 3308, // Port for master (from docker-compose.yml)
       username: 'user',
       password: 'password',
