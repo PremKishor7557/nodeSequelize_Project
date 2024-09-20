@@ -41,6 +41,7 @@ router.post('/login',
 
 //router.use(jwtmdwr.authenticateToken);
 router.get('/getuser', jwtmdwr.isAuthenticated, registerCtrl.getUserDetails)
+router.get('/users',registerCtrl.getUser);
 router.get('/edituser/:id', registerCtrl.getEditUser);
 router.post('/edituser/:id', registerCtrl.postEditUser);
 router.get('/listuser', registerCtrl.getListUser);
@@ -50,6 +51,6 @@ router.get('/verify-otp', (req, res)=>{
 router.post('/verify-otp', registerCtrl.verifyOtp);
 router.get('/verify-email', registerCtrl.verifyEmail);
 registerCtrl.sendReminderEmails();
-//registerCtrl.stopReminderEmails();
+registerCtrl.stopReminderEmails();
 
 module.exports = router;

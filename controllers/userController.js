@@ -22,7 +22,7 @@ const nodemailer = require("nodemailer");
 //     res.status(200).json(jane.toJSON());
 // }
 var addUser = async (req, res) =>{
-    const jane = await User.create({ firstName: "nilesh" ,lastName: "dawn"});
+    const jane = await User.create({ firstName: "vikram" ,lastName: "kumar"});
     console.log(jane.toJSON());
     res.status(200).json(jane.toJSON());
 }

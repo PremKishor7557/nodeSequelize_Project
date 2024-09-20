@@ -268,6 +268,16 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+const getUser = async (req, res) => {
+  try {
+    const users = await addUser.findAll(); // Fetch all users from the database
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Error fetching users' });
+  }
+};
+
 
 var getEditUser = async (req, res) =>{
     try {
@@ -438,5 +448,6 @@ module.exports = {
     verifyOtp,
     verifyEmail,
     sendReminderEmails,
-    stopReminderEmails
+    stopReminderEmails,
+    getUser
 };

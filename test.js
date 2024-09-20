@@ -10,3 +10,9 @@
 //     }
 // }
 // console.log(a);
+
+var a=100;
+function x(){
+    var a=10;
+}
+console.log(a);

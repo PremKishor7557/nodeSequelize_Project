@@ -8,8 +8,15 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerFile = require('./swagger-output.json'); // Generated file
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+const cors = require('cors');
 
 var app = express();
+
+app.use(cors({
+  origin: 'http://localhost:3001', // Allow requests from your frontend
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
